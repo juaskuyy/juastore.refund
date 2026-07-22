@@ -1,21 +1,12 @@
-# Kalkulator Refund JuaStore
+Upload semua file ini ke repository GitHub `juastore.refund`.
 
-## Cara upload ke GitHub Pages
-1. Buat repository baru di GitHub.
-2. Upload file `index.html`.
-3. Buka **Settings → Pages**.
-4. Pilih **Deploy from a branch**.
-5. Pilih branch **main** dan folder **/root**.
-6. Klik **Save**.
+Isi folder:
+- index.html
+- CNAME
 
-## Memasang domain sendiri
-Untuk subdomain seperti `refund.juastore.web.id`:
-
-- Type: `CNAME`
-- Name: `refund`
-- Target: `USERNAME-GITHUB.github.io`
-
-Setelah itu, masukkan `refund.juastore.web.id` di:
-**GitHub → Settings → Pages → Custom domain**
-
-Website sudah responsif dan bisa dibuka di HP maupun komputer.
+Setelah upload:
+1. Buka Settings → Pages.
+2. Source: Deploy from a branch.
+3. Branch: main, folder: /(root).
+4. Custom domain: juastore.my.id
+5. Tunggu DNS dan SSL aktif.
