@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#b8aeb3" />
+  <title>Kalkulator Refund JuaStore</title>
+  <style>
+    :root{
+      --bg1:#d9d2d5;
+      --bg2:#aaa1a6;
+      --panel:rgba(245,242,243,.92);
+      --card:#f8f5f6;
+      --text:#a60d45;
+      --muted:#b24a70;
+      --border:#f0c9d8;
+      --button:#898989;
+      --buttonText:#fff;
+      --ring:#f4bad0;
+      --ring2:#9d9d9d;
+      --shadow:0 16px 45px rgba(74,58,66,.20);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 10px 10px, rgba(255,255,255,.22) 1.6px, transparent 1.7px) 0 0/22px 22px,
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+      transition:.25s ease;
+    }
+
+    body.dark{
+      --bg1:#262326;
+      --bg2:#121112;
+      --panel:rgba(32,29,31,.94);
+      --card:#292527;
+      --text:#ffd5e4;
+      --muted:#eba7c2;
+      --border:#644554;
+      --button:#575357;
+      --buttonText:#fff;
+      --ring:#ab5678;
+      --ring2:#8d8a8c;
+      --shadow:0 18px 55px rgba(0,0,0,.45);
+    }
+
+    .page{
+      width:min(100% - 24px, 460px);
+      margin:40px auto 26px;
+    }
+
+    .shell{
+      background:var(--panel);
+      border:2px solid rgba(255,199,220,.7);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:22px 18px 18px;
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar{
+      display:flex;
+      gap:12px;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:14px;
+    }
+
+    .tip{
+      font-size:12px;
+      line-height:1.45;
+      color:var(--muted);
+      max-width:245px;
+      margin:2px 0 0;
+    }
+
+    .tip code{
+      font-family:inherit;
+      background:rgba(255,255,255,.55);
+      border-radius:6px;
+      padding:2px 6px;
+      border:1px solid var(--border);
+    }
+
+    .theme-btn{
+      border:0;
+      border-radius:14px;
+      padding:11px 14px;
+      color:var(--text);
+      background:var(--card);
+      font-weight:700;
+      box-shadow:0 4px 12px rgba(0,0,0,.06);
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .tabs{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px 12px;
+      padding:4px 0 18px;
+      border-bottom:1px solid rgba(162,81,112,.12);
+      margin-bottom:22px;
+    }
+
+    .tab{
+      border:0;
+      border-radius:12px;
+      min-height:42px;
+      background:transparent;
+      color:var(--text);
+      font-weight:700;
+      cursor:pointer;
+      padding:10px 8px;
+    }
+
+    .tab.active{
+      background:var(--button);
+      color:white;
+      box-shadow:0 6px 14px rgba(0,0,0,.12);
+    }
+
+    .view{display:none}
+    .view.active{display:block}
+
+    h1{
+      margin:0 0 18px;
+      font-size:24px;
+      line-height:1.1;
+      text-transform:uppercase;
+      letter-spacing:.2px;
+    }
+
+    .form-card,.result-card,.simple-card{
+      background:var(--card);
+      border:1px solid rgba(255,255,255,.42);
+      border-radius:22px;
+      padding:16px;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);
+    }
+
+    .field{margin-bottom:14px}
+    label{
+      display:block;
+      margin-bottom:7px;
+      font-size:15px;
+      font-weight:800;
+    }
+
+    input,select{
+      width:100%;
+      min-height:46px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:rgba(255,255,255,.58);
+      color:var(--text);
+      padding:0 14px;
+      font-size:16px;
+      outline:none;
+      transition:.2s ease;
+    }
+
+    body.dark input, body.dark select{
+      background:rgba(255,255,255,.05);
+    }
+
+    input:focus,select:focus{
+      border-color:#d780a2;
+      box-shadow:0 0 0 3px rgba(215,128,162,.16);
+    }
+
+    .help{
+      display:block;
+      margin-top:7px;
+      font-size:12px;
+      line-height:1.4;
+      color:var(--muted);
+    }
+
+    .range-row{
+      display:grid;
+      grid-template-columns:1fr 70px;
+      gap:12px;
+      align-items:center;
+    }
+
+    input[type="range"]{
+      min-height:26px;
+      padding:0;
+      border:0;
+      accent-color:#8e8e8e;
+      background:transparent;
+    }
+
+    .rate-pill{
+      min-height:38px;
+      border-radius:20px;
+      border:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#f6dbe6;
+      font-weight:800;
+      font-size:18px;
+      color:#9f1748;
+    }
+
+    body.dark .rate-pill{background:#503441;color:#ffd4e4}
+
+    .calc-btn{
+      width:100%;
+      min-height:46px;
+      margin-top:4px;
+      border:0;
+      border-radius:12px;
+      background:var(--button);
+      color:var(--buttonText);
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+    .calc-btn:active{transform:scale(.99)}
+
+    .result-card{
+      margin-top:20px;
+      text-align:center;
+      padding:22px 16px 18px;
+    }
+
+    .result-label{
+      font-size:18px;
+      letter-spacing:1px;
+      font-weight:800;
+      margin-bottom:10px;
+    }
+
+    .result-amount{
+      font-size:42px;
+      line-height:1;
+      margin:0 0 20px;
+      font-weight:800;
+    }
+
+    .donut{
+      --p:0deg;
+      width:142px;
+      aspect-ratio:1;
+      border-radius:50%;
+      margin:0 auto 18px;
+      background:conic-gradient(var(--ring2) 0 var(--p), var(--ring) var(--p) 360deg);
+      position:relative;
+      display:grid;
+      place-items:center;
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
+    }
+    .donut::before{
+      content:"";
+      width:94px;
+      aspect-ratio:1;
+      border-radius:50%;
+      background:var(--card);
+      position:absolute;
+    }
+    .donut strong{
+      position:relative;
+      z-index:1;
+      font-size:18px;
+    }
+
+    .detail{
+      font-size:13px;
+      line-height:1.45;
+      color:var(--muted);
+      font-weight:700;
+      margin:0;
+    }
+
+    .footer{
+      text-align:center;
+      padding:18px 8px 2px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .simple-card h2{
+      margin:0 0 14px;
+      font-size:20px;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .day-result{
+      margin-top:14px;
+      font-size:28px;
+      font-weight:800;
+      text-align:center;
+    }
+
+    .calendar-grid{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:6px;
+      font-size:12px;
+    }
+    .calendar-grid div{
+      min-height:34px;
+      border-radius:9px;
+      display:grid;
+      place-items:center;
+      background:rgba(255,255,255,.35);
+    }
+    .calendar-grid .head{
+      background:transparent;
+      font-weight:800;
+    }
+    .calendar-grid .today{
+      background:var(--button);
+      color:white;
+      font-weight:800;
+    }
+
+    @media(max-width:380px){
+      .page{width:min(100% - 14px,460px);margin-top:18px}
+      .shell{padding:18px 12px}
+      .topbar{gap:8px}
+      .theme-btn{padding:10px}
+      h1{font-size:22px}
+      .result-amount{font-size:36px}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="shell">
+      <div class="topbar">
+        <p class="tip">
+          <strong>Tips:</strong> kamu bisa buka <code>Pengaturan Latar</code> untuk ubah tema.
+        </p>
+        <button class="theme-btn" id="themeBtn">Pengaturan Latar</button>
+      </div>
+
+      <nav class="tabs">
+        <button class="tab active" data-view="refund">Kalkulator Refund</button>
+        <button class="tab" data-view="days">Hitung Hari</button>
+        <button class="tab" data-view="date">Penanggalan</button>
+        <button class="tab" data-view="calendar">Kalender</button>
+      </nav>
+
+      <section class="view active" id="refund">
+        <h1>Kalkulator Refund<br>Aplikasi</h1>
+
+        <div class="form-card">
+          <div class="field">
+            <label for="price">Harga Beli (Rp)</label>
+            <input id="price" type="number" min="0" value="20000" inputmode="numeric">
+          </div>
+
+          <div class="field">
+            <label for="remaining">Sisa Masa Aktif (Hari)</label>
+            <input id="remaining" type="number" min="0" value="7" inputmode="numeric">
+          </div>
+
+          <div class="field">
+            <label for="duration">Durasi Total (Hari)</label>
+            <input id="duration" type="number" min="1" value="30" inputmode="numeric">
+            <span class="help">Patokan: 1 bulan=25, 2 bulan=50, 3 bulan=75</span>
+          </div>
+
+          <div class="field">
+            <label for="serviceFee">Service Fee</label>
+            <select id="serviceFee">
+              <option value="1">1.0 — belum pernah klaim garansi</option>
+              <option value="0.7">0.7 — sudah pernah klaim 1–2×</option>
+              <option value="0.4" selected>0.4 — sudah pernah klaim garansi &gt; 3×</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="rate">Rate Refund</label>
+            <div class="range-row">
+              <input id="rate" type="range" min="0.1" max="1" step="0.1" value="0.4">
+              <div class="rate-pill" id="rateValue">0.4</div>
+            </div>
+            <span class="help">Rumus: harga beli × sisa durasi ÷ total durasi × rate</span>
+          </div>
+
+          <div class="field">
+            <label for="discount">Diskon Tambahan (%)</label>
+            <input id="discount" type="number" min="0" max="100" value="0" inputmode="decimal">
+          </div>
+
+          <button class="calc-btn" id="calculateBtn">Hitung</button>
+          <span class="help">Contoh: 60.000 × 3 ÷ 25 × 0.7 ≈ 5.040 (dibulatkan).</span>
+        </div>
+
+        <div class="result-card">
+          <div class="result-label">HASIL REFUND</div>
+          <div class="result-amount" id="resultAmount">Rp 1.867</div>
+          <div class="donut" id="donut"><strong id="percentText">23%</strong></div>
+          <p class="detail" id="detailText">Detail: Rp 20.000 × 7 ÷ 30 × 0.4<br>Hasil dibulatkan ke rupiah terdekat.</p>
+        </div>
+      </section>
+
+      <section class="view" id="days">
+        <div class="simple-card">
+          <h2>Hitung Selisih Hari</h2>
+          <div class="field">
+            <label for="startDate">Tanggal Awal</label>
+            <input id="startDate" type="date">
+          </div>
+          <div class="field">
+            <label for="endDate">Tanggal Akhir</label>
+            <input id="endDate" type="date">
+          </div>
+          <button class="calc-btn" id="countDaysBtn">Hitung Hari</button>
+          <div class="day-result" id="daysResult">0 hari</div>
+        </div>
+      </section>
+
+      <section class="view" id="date">
+        <div class="simple-card">
+          <h2>Tambah Hari ke Tanggal</h2>
+          <div class="field">
+            <label for="baseDate">Tanggal Awal</label>
+            <input id="baseDate" type="date">
+          </div>
+          <div class="field">
+            <label for="addDays">Jumlah Hari</label>
+            <input id="addDays" type="number" value="30">
+          </div>
+          <button class="calc-btn" id="addDaysBtn">Hitung Tanggal</button>
+          <div class="day-result" id="dateResult">-</div>
+        </div>
+      </section>
+
+      <section class="view" id="calendar">
+        <div class="simple-card">
+          <h2 id="calendarTitle">Kalender</h2>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+      </section>
+    </section>
+
+    <footer class="footer">© 2026 — Website JuaStore</footer>
+  </main>
+
+  <script>
+    const rupiah = n => new Intl.NumberFormat("id-ID").format(Math.round(n || 0));
+
+    const el = id => document.getElementById(id);
+    const price = el("price");
+    const remaining = el("remaining");
+    const duration = el("duration");
+    const serviceFee = el("serviceFee");
+    const rate = el("rate");
+    const rateValue = el("rateValue");
+    const discount = el("discount");
+    const resultAmount = el("resultAmount");
+    const detailText = el("detailText");
+    const donut = el("donut");
+    const percentText = el("percentText");
+
+    function calculateRefund(){
+      const p = Math.max(0, Number(price.value) || 0);
+      const r = Math.max(0, Number(remaining.value) || 0);
+      const d = Math.max(1, Number(duration.value) || 1);
+      const selectedFee = Number(serviceFee.value) || 1;
+      const customRate = Number(rate.value) || selectedFee;
+      const disc = Math.min(100, Math.max(0, Number(discount.value) || 0));
+
+      serviceFee.value = [...serviceFee.options].some(o => Number(o.value) === customRate)
+        ? String(customRate) : serviceFee.value;
+
+      let result = p * r / d * customRate;
+      result = result * (1 - disc / 100);
+      result = Math.max(0, Math.round(result));
+
+      const percent = p > 0 ? Math.min(100, Math.round((result / p) * 100)) : 0;
+      resultAmount.textContent = "Rp " + rupiah(result);
+      detailText.innerHTML =
+        `Detail: Rp ${rupiah(p)} × ${r} ÷ ${d} × ${customRate}` +
+        (disc > 0 ? ` − ${disc}%` : "") +
+        `<br>Hasil dibulatkan ke rupiah terdekat.`;
+      percentText.textContent = percent + "%";
+      donut.style.setProperty("--p", (percent * 3.6) + "deg");
+    }
+
+    rate.addEventListener("input", () => {
+      rateValue.textContent = Number(rate.value).toFixed(1);
+      calculateRefund();
+    });
+
+    serviceFee.addEventListener("change", () => {
+      rate.value = serviceFee.value;
+      rateValue.textContent = Number(rate.value).toFixed(1);
+      calculateRefund();
+    });
+
+    ["input","change"].forEach(evt => {
+      [price,remaining,duration,discount].forEach(node =>
+        node.addEventListener(evt, calculateRefund)
+      );
+    });
+    el("calculateBtn").addEventListener("click", calculateRefund);
+
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+        document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
+        btn.classList.add("active");
+        el(btn.dataset.view).classList.add("active");
+      });
+    });
+
+    el("themeBtn").addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("refundTheme", document.body.classList.contains("dark") ? "dark" : "light");
+    });
+
+    if(localStorage.getItem("refundTheme") === "dark"){
+      document.body.classList.add("dark");
+    }
+
+    const today = new Date();
+    const isoToday = today.toISOString().slice(0,10);
+    el("startDate").value = isoToday;
+    el("endDate").value = isoToday;
+    el("baseDate").value = isoToday;
+
+    el("countDaysBtn").addEventListener("click", () => {
+      const a = new Date(el("startDate").value + "T00:00:00");
+      const b = new Date(el("endDate").value + "T00:00:00");
+      if (isNaN(a) || isNaN(b)) return;
+      const days = Math.round(Math.abs(b-a)/86400000);
+      el("daysResult").textContent = days + " hari";
+    });
+
+    el("addDaysBtn").addEventListener("click", () => {
+      const d = new Date(el("baseDate").value + "T00:00:00");
+      const amount = Number(el("addDays").value) || 0;
+      if (isNaN(d)) return;
+      d.setDate(d.getDate()+amount);
+      el("dateResult").textContent = d.toLocaleDateString("id-ID", {
+        weekday:"long", day:"numeric", month:"long", year:"numeric"
+      });
+    });
+
+    function buildCalendar(date = new Date()){
+      const y = date.getFullYear();
+      const m = date.getMonth();
+      const first = new Date(y,m,1);
+      const last = new Date(y,m+1,0);
+      const names = ["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
+      const grid = el("calendarGrid");
+      grid.innerHTML = "";
+      el("calendarTitle").textContent = new Date(y,m,1).toLocaleDateString("id-ID",{month:"long",year:"numeric"});
+      names.forEach(n => {
+        const x = document.createElement("div");
+        x.className = "head";
+        x.textContent = n;
+        grid.appendChild(x);
+      });
+      for(let i=0;i<first.getDay();i++) grid.appendChild(document.createElement("div"));
+      for(let day=1;day<=last.getDate();day++){
+        const x = document.createElement("div");
+        x.textContent = day;
+        if(day===today.getDate() && m===today.getMonth() && y===today.getFullYear()){
+          x.className = "today";
+        }
+        grid.appendChild(x);
+      }
+    }
+
+    buildCalendar();
+    calculateRefund();
+  </script>
+</body>
+</html>
